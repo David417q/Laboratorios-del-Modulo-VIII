@@ -1,0 +1,91 @@
+PRACTICA 1
+
+instalar docker 
+
+sudo dnf install docker -y
+
+sudo systemctl start docker
+sudo systemctl enable docker
+
+
+descargar ngix 
+
+sudo docker pull nginx
+
+sudo docker images
+
+sudo mkdir -p /home/website
+
+sudo docker run -d --name nginx-container -p 8888:80 -v /home/website:/usr/share/nginx/html nginx
+
+sudo nano /home/website/index.html
+
+sudo chcon -R -t container_file_t /home/website
+
+
+<html>
+<h1> David Cabrera 20241922 </h1>
+</html>
+
+
+
+PRACTICA 2 
+
+
+sudo docker pull portainer/portainer-ce
+
+sudo docker volume create portainer_data
+
+sudo docker run -d -p 9000:9000 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce
+
+
+
+PRACTICA 3
+
+
+sudo dnf install docker-compose
+
+mkdir wordpress
+cd proyecto-wordpress
+nano docker-compose.yml
+
+
+
+version: '3'
+services:
+  db:
+    image: mariadb:latest
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: somewordpress
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+    restart: unless-stopped
+
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress:latest
+    ports:
+      - "8080:80"
+    volumes:
+      - wordpress_data:/var/www/html
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    restart: unless-stopped
+
+volumes:
+  db_data:
+  wordpress_data:
+
+docker-compose up -d
+
+docker-compose ps
+
+
+http://127.0.0.1:8080
